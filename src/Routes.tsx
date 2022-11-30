@@ -4,19 +4,29 @@ import {
   Route
 } from 'react-router-dom';
 
-import Login from './components/Login';
-import MainPage from './components/MainPage';
-import Registration from './components/Registration';
+import Main from './pages/Main';
+import Login from './pages/Login';
+import Registration from './pages/Registration';
+
+import { AuthProvider } from './contexts/Auth';
+import Private from './components/Private';
+
 
 
 export function AppRoutes() {
   return (
     <Router>
-      <Routes>
-        <Route path='/login' element={<Login />} />
-        <Route path='/cadastro' element={<Registration />} />
-        <Route path='/pagina-principal' element={<MainPage />} />
-      </Routes>
+      <AuthProvider>
+        <Routes>
+          <Route path='/' element={<Login />} />
+          <Route path='/cadastro' element={<Registration />} />
+          <Route path='/pagina-principal' element={
+            <Private>
+              <Main />
+            </Private>
+          } />
+        </Routes>
+      </AuthProvider>
     </Router>
   )
 }
