@@ -17,21 +17,31 @@ export const Content = styled.div`
   align-items: center;
   justify-content: space-between;
 
-  button {
-    font-size: 1rem;
+  .logout-container {
+    display: flex;
+    align-items: center;
+    margin-right: 50px;
+  }
+    span {
+      color: #ffffff;
+      margin-right: 25px;
+    }
+
+    button {
+    font-size: 0.9rem;
     color: #000;
     background: #ffffff;
     font-weight: 600;
     border: 0;
-    padding: 0 2rem;
+    padding: 0 1rem;
     border-radius: 0.25rem;
-    height: 3rem;
+    height: 2rem;
     transition: filter 0.2s;
-
-    margin-right: 60px;
 
     &:hover {
       filter: brightness(0.9);
     }
   }
 `;
+
+

@@ -1,16 +1,18 @@
 import { createContext, useEffect, useState } from "react";
-import { json, useNavigate } from "react-router-dom";
-import { Api, createSession, createUser } from "../services/api";
+import { useNavigate } from "react-router-dom";
+import { IBalanceData } from "../interfaces";
+import { Api, createSession, createUser, getBalance } from "../services/api";
 
 
 interface IContext {
-  authenticated: (user: string) => Promise<void>
+  authenticated: boolean
   login: (username: string, password: string) => void;
   signUp: (username: string, password: string) => void
   logout: () => void;
   loading: boolean
-  user: IUserData | null;
-  newUser: IUserData | null;
+  accessToken: IAccessTokenData | null;
+  userData: IBalanceData | null
+  fetchUserData: () => void
 }
 
 interface IProvider {
@@ -18,7 +20,7 @@ interface IProvider {
 }
 
 
-interface IUserData {
+interface IAccessTokenData {
   token: string
 }
 
@@ -26,21 +28,53 @@ export const AuthContext = createContext<IContext>({} as IContext);
 
 
 export const AuthProvider = ({ children }: IProvider) => {
-  const [user, setUser] = useState<IUserData | null>(null);
-  const [newUser, setNewUser] = useState<IUserData | null>(null);
+  const [accessToken, setAccessToken] = useState<IAccessTokenData | null>(null);
   const [loading, setLoading] = useState(true)
+  const [userBalance, setUserBalance] = useState<IBalanceData>({})
+  const [userData, setUserData] = useState<IBalanceData>({
+    User: '',
+    Balance: ''
+  })
+
   const navigate = useNavigate()
 
-
-  useEffect(() => {
+  const savingAccessToken = () => {
     const recoverdUser = localStorage.getItem('token')
 
     if (recoverdUser) {
-      setUser(JSON.parse(recoverdUser))
+      setAccessToken(JSON.parse(recoverdUser))
     }
-
     setLoading(false)
-  }, [])
+  }
+
+  const fetchUserData = () => {
+    (async () => {
+      try {
+        const responseUserData = await getBalance();
+        setUserBalance(responseUserData.data)
+        console.log(responseUserData.data)
+        localStorage.setItem('user', JSON.stringify(responseUserData.data))
+      } catch (error) {
+        console.log(error)
+      }
+    })()
+  }
+
+
+  const settingUserData = () => {
+    const savedUser = localStorage.getItem('user')
+    console.log({ savedUser })
+    if (savedUser) {
+      const user = JSON.parse(savedUser);
+      console.log({ user })
+
+      if (user) {
+        setUserData(user)
+      } else {
+        setUserData(userBalance)
+      }
+    }
+  }
 
 
   const login = async (username: string, password: string) => {
@@ -53,15 +87,17 @@ export const AuthProvider = ({ children }: IProvider) => {
 
     Api.defaults.headers.Authorization = `Bearer ${token}`
 
-    setUser(token)
+    setAccessToken(token)
     navigate('/pagina-principal')
+
+    return token;
   }
 
   const signUp = async (username: string, password: string) => {
     const response = await createUser(username, password);
     console.log(response.data)
 
-    if (response.status === 200) {
+    if (response.status === 201) {
       alert('Usuário criado com sucesso!')
       navigate('/')
     }
@@ -69,14 +105,19 @@ export const AuthProvider = ({ children }: IProvider) => {
 
   const logout = () => {
     localStorage.removeItem('token')
+    localStorage.removeItem('user')
     Api.defaults.headers.Authorization = null
-    setUser(null)
+    setAccessToken(null)
     navigate('/')
   }
 
+  useEffect(savingAccessToken, [])
+  useEffect(fetchUserData, [])
+  useEffect(settingUserData, [userBalance])
+
 
   return (
-    <AuthContext.Provider value={{ authenticated: !!user, user, login, logout, loading, signUp, newUser }}>
+    <AuthContext.Provider value={{ authenticated: !!accessToken, accessToken, login, logout, loading, signUp, userData, fetchUserData }}>
       {children}
     </AuthContext.Provider>
   )

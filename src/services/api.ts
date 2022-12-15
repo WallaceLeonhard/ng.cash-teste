@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const Api = axios.create({
-  baseURL: "https://f970-200-124-166-143.ngrok.io/api/v1",
+  baseURL: "https://c4fb-200-124-166-153.ngrok.io/api/v1",
 });
 
 export const createSession = async (username: string, password: string) => {
@@ -13,8 +13,9 @@ export const createSession = async (username: string, password: string) => {
   return response;
 };
 
-export const getBalance = async () => {
-  const response = Api.get("/find-balance");
+export const getBalance = async (): Promise<any> => {
+  const response =
+    await Api.get("/find-balance")
 
   return response;
 };

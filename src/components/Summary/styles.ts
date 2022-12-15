@@ -8,8 +8,7 @@ export const Container = styled.div`
 
   div {
     background: #ffff;
-
-    padding: 1.5rem 2rem;
+    padding: 1.25rem 1.75rem;
     border-radius: 0.25rem;
     color: #000000;
 
@@ -22,9 +21,9 @@ export const Container = styled.div`
     strong {
       display: block;
       margin-top: 1rem;
-      font-size: 2rem;
+      font-size: 1.75rem;
       font-weight: 500;
-      line-height: 3rem;
+      line-height: 2rem;
     }
 
     &.total-container {
@@ -33,3 +32,4 @@ export const Container = styled.div`
     }
   }
 `;
+

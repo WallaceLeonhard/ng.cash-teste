@@ -10,6 +10,7 @@ export const Button = styled.button`
   font-size: 1rem;
   letter-spacing: 1px;
   transition: all 0.3s;
+
   &:hover {
     transform: scale(1.03);
   }
